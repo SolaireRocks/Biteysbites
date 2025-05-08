@@ -1,1 +1,153 @@
-sup
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOORAY! You're at Bitey's Bites!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Poppins:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #FFF8E1; /* Creamy background */
+            color: #4A3F35; /* Dark brown text */
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #FFFFFF;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .logo-container {
+            margin-bottom: 20px;
+        }
+
+        .logo-text {
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 3.5em; /* Responsive font size could be better with clamp() */
+            color: #FF7043; /* Bitey Orange */
+            margin: 0;
+            text-shadow: 2px 2px #FFCC80; /* Lighter orange shadow */
+        }
+
+        .logo-emoji {
+            font-size: 3em;
+            display: block; /* Or inline-block if you want it next to text */
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-family: 'Luckiest Guy', cursive;
+            color: #D32F2F; /* Bitey Red */
+            font-size: 2.8em;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .highlight {
+            color: #FF7043; /* Bitey Orange */
+            font-weight: 700;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: #FF7043; /* Bitey Orange */
+            color: #FFFFFF;
+            padding: 15px 30px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1em;
+            border-radius: 50px; /* Pill shape */
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(255, 112, 67, 0.4);
+        }
+
+        .cta-button:hover {
+            background-color: #F4511E; /* Darker Orange */
+            transform: translateY(-2px);
+        }
+
+        .confetti {
+            font-size: 2em; /* Make confetti bigger */
+            margin: 10px 0;
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #795548; /* Lighter brown */
+        }
+
+        /* Basic responsiveness */
+        @media (max-width: 600px) {
+            .logo-text {
+                font-size: 2.5em;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            p {
+                font-size: 1em;
+            }
+            .cta-button {
+                padding: 12px 25px;
+                font-size: 1em;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <!-- You could replace this with an actual image logo -->
+            <span class="logo-emoji">🦷🍔</span>
+            <h1 class="logo-text">Bitey's Bites</h1>
+        </div>
+
+        <div class="confetti">🎉🥳🎊</div>
+
+        <h1>YOU MADE IT!</h1>
+
+        <p>
+            Seriously, give yourself a high-five! You've successfully navigated the wilds
+            (or maybe just the traffic) and arrived at the legendary
+            <strong class="highlight">Bitey's Bites!</strong>
+        </p>
+        <p>
+            We're SO thrilled to see your smiling face. Get ready for some
+            <strong class="highlight">epically delicious</strong> food that'll make your taste buds do a happy dance.
+            Your quest for amazing flavor ends here!
+        </p>
+
+        <a href="#menu" class="cta-button">Explore the Menu & Get Biting!</a>
+        <!-- The href="#menu" is a placeholder. Link it to your menu page or section. -->
+
+    </div>
+
+    <footer>
+        <p>© Bitey's Bites - Where every bite is an adventure!</p>
+    </footer>
+
+</body>
+</html>
