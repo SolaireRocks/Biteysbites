@@ -1,0 +1,81 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitey's Game Hub</title>
+    <link rel="stylesheet" href="/Biteysbites.3a01df49.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome to Bitey's Game Hub!</h1>
+		
+    </header>
+
+    <main>
+	
+        <section id="auth-section">
+		<!-- Inside <section id="auth-section"> -->
+<div id="profile-setup" style="display: none"> <!-- Renamed from username-setup -->
+    <h3>Complete Your Profile</h3>
+    <p>Please provide a few more details for our Game Hub!</p>
+    
+    <div>
+        <label for="firstNameInput">First Name:</label>
+        <input type="text" id="firstNameInput" placeholder="Your first name">
+    </div>
+    
+    <div>
+        <label for="usernameInput">Choose a Username:</label>
+        <input type="text" id="usernameInput" placeholder="Unique username (3-20 chars)">
+        <small>Letters, numbers, and underscores only. Keep it friendly!</small>
+    </div>
+    
+    <button id="saveProfileBtn">Save Profile</button> <!-- Renamed from saveUsernameBtn -->
+    <p id="profileError" style="color: red; display: none"></p> <!-- Renamed -->
+</div>
+            <h2>Login / User Info</h2>
+			<!-- In #userInfo -->
+<p>Welcome, <span id="greetingName"></span>!</p> <!-- Changed from userName -->
+<img id="userPhoto" src="#" alt="User Photo" width="50" style="display: none">
+<p>Username: <span id="displayedUsername" style="font-weight: bold"></span></p> <!-- Added to display username separately -->
+<button id="logoutBtn">Logout</button>
+            <div id="auth-container">
+                <!-- Login buttons will be shown if not logged in -->
+                <button id="loginGoogleBtn">Login with Google</button>
+                <button id="loginDiscordBtn">Login with Discord</button>
+
+                <!-- User info and logout will be shown if logged in -->
+                <div id="userInfo" style="display: none">
+                    <p>Welcome, <span id="userName"></span>!</p>
+                    <img id="userPhoto" src="#" alt="User Photo" width="50" style="display: none">
+                    <button id="logoutBtn">Logout</button>
+                </div>
+            </div>
+			<!-- Inside <section id="auth-section">, maybe after #userInfo -->
+<div id="username-setup" style="display: none">
+    <h3>Set Your Username</h3>
+    <p>Please choose a username for our Game Hub!</p>
+    <input type="text" id="usernameInput" placeholder="Enter your username">
+    <button id="saveUsernameBtn">Save Username</button>
+    <p id="usernameError" style="color: red; display: none"></p>
+</div>
+        </section>
+
+        <section id="games-section">
+            <h2>Our Games</h2>
+            <div id="game-links-container">
+                <!-- Links to games will be shown to everyone, or maybe only logged-in users -->
+                <p>Please log in to see available games.</p> 
+                <ul id="gameList" style="display: none">
+                    <!-- Add more game links here -->
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2023 Bitey's Bites - Game Hub</p>
+    </footer>
+
+    <script type="module" src="/Biteysbites.f72d0d54.js"></script>
+
+</body></html>

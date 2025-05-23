@@ -1,0 +1,100 @@
+body {
+    font-family: sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header {
+    background: #333;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+}
+
+main {
+    padding: 20px;
+    max-width: 800px;
+    margin: 20px auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+section {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+section:last-child {
+    border-bottom: none;
+}
+
+h2 {
+    color: #333;
+}
+
+#auth-container button {
+    padding: 10px 15px;
+    margin-right: 10px;
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#auth-container button:hover {
+    background-color: #4cae4c;
+}
+
+#logoutBtn {
+    background-color: #d9534f;
+}
+#logoutBtn:hover {
+    background-color: #c9302c;
+}
+
+#userInfo p {
+    margin-bottom: 10px;
+}
+
+#userPhoto {
+    border-radius: 50%;
+    margin-bottom: 10px;
+    border: 2px solid #ddd;
+}
+
+#gameList {
+    list-style: none;
+    padding: 0;
+}
+
+#gameList li {
+    margin-bottom: 10px;
+}
+
+#gameList a {
+    text-decoration: none;
+    color: #337ab7;
+    font-weight: bold;
+}
+
+#gameList a:hover {
+    text-decoration: underline;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background: #333;
+    color: #fff;
+    margin-top: 30px;
+}
