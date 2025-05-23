@@ -667,12 +667,9 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 }
 
 },{}],"4ZGjQ":[function(require,module,exports,__globalThis) {
-// Import the functions you need from the SDKs you need
+// app.js
 var _app = require("firebase/app");
-// import { getAnalytics } from "firebase/analytics"; // Optional: if you want to use analytics
-// Import Authentication functions
 var _auth = require("firebase/auth");
-// Import Firestore functions (we'll use this to save user profiles)
 var _firestore = require("firebase/firestore");
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -682,118 +679,277 @@ const firebaseConfig = {
     storageBucket: "biteysbites.firebasestorage.app",
     messagingSenderId: "192250302371",
     appId: "1:192250302371:web:b0557cae57ef9575f69416",
-    measurementId: "G-Y0B3P5EPLK" // Optional
+    measurementId: "G-Y0B3P5EPLK"
 };
 // Initialize Firebase
 const app = (0, _app.initializeApp)(firebaseConfig);
-// const analytics = getAnalytics(app); // Uncomment if you want to use analytics
-// Initialize Firebase Authentication and Firestore
 const auth = (0, _auth.getAuth)(app);
 const db = (0, _firestore.getFirestore)(app);
+// --- Client-Side Bad Word List (Simple Example) ---
+// For production, a more comprehensive list and server-side validation (Cloud Function) is recommended.
+const BAD_WORDS = [
+    "admin",
+    "root",
+    "moderator",
+    "fuck",
+    "shit",
+    "cunt",
+    "asshole",
+    "bitch"
+]; // Add more as needed
 // DOM Elements
 const loginGoogleBtn = document.getElementById('loginGoogleBtn');
 const loginDiscordBtn = document.getElementById('loginDiscordBtn');
 const logoutBtn = document.getElementById('logoutBtn');
-const userInfoDiv = document.getElementById('userInfo');
-const userNameSpan = document.getElementById('userName');
-const userPhotoImg = document.getElementById('userPhoto');
+const loginButtonsContainer = document.getElementById('login-buttons-container');
+const userInfoContainer = document.getElementById('user-info-container');
+const userPhoto = document.getElementById('userPhoto');
+const greetingNameSpan = document.getElementById('greetingName');
+const displayedUsernameSpan = document.getElementById('displayedUsername');
+const profileSetupDiv = document.getElementById('profile-setup');
+const preferredNameInput = document.getElementById('preferredNameInput'); // New
+const firstNameInput = document.getElementById('firstNameInput');
+const usernameInput = document.getElementById('usernameInput');
+const saveProfileBtn = document.getElementById('saveProfileBtn');
+const profileErrorP = document.getElementById('profileError');
 const gameLinksContainerP = document.querySelector('#game-links-container p');
 const gameListUl = document.getElementById('gameList');
 // --- Authentication Logic ---
-// Google Sign-In
-loginGoogleBtn.addEventListener('click', ()=>{
-    const provider = new (0, _auth.GoogleAuthProvider)();
-    (0, _auth.signInWithPopup)(auth, provider).then((result)=>{
-        console.log("Google Sign-In Successful", result.user);
-    // User is signed in. You can access user info via result.user
-    // The onAuthStateChanged listener will handle UI updates and saving user data.
-    }).catch((error)=>{
-        console.error("Google Sign-In Error", error);
-        alert(`Google Sign-In Error: ${error.message}`);
+loginGoogleBtn.addEventListener('click', ()=>handleSignIn(new (0, _auth.GoogleAuthProvider)()));
+loginDiscordBtn.addEventListener('click', ()=>handleSignIn(new (0, _auth.OAuthProvider)('discord.com')));
+function handleSignIn(provider) {
+    (0, _auth.signInWithPopup)(auth, provider).then((result)=>console.log(`${provider.providerId} Sign-In Successful`, result.user)).catch((error)=>{
+        console.error(`${provider.providerId} Sign-In Error`, error);
+        if (error.code === 'auth/account-exists-with-different-credential') alert('An account already exists with the same email but different sign-in. Try the original provider.');
+        else alert(`${provider.providerId} Sign-In Error: ${error.message}`);
     });
-});
-// Discord Sign-In
-loginDiscordBtn.addEventListener('click', ()=>{
-    const provider = new (0, _auth.OAuthProvider)('discord.com'); // Ensure 'discord.com' is enabled in Firebase Console
-    // You might want to request specific scopes if needed:
-    // provider.addScope('identify');
-    // provider.addScope('email');
-    (0, _auth.signInWithPopup)(auth, provider).then((result)=>{
-        console.log("Discord Sign-In Successful", result.user);
-    // The onAuthStateChanged listener will handle UI updates and saving user data.
-    }).catch((error)=>{
-        console.error("Discord Sign-In Error", error);
-        // Handle specific errors, e.g., account exists with different credential
-        if (error.code === 'auth/account-exists-with-different-credential') alert('An account already exists with the same email address but different sign-in credentials. Try signing in with the original provider.');
-        else alert(`Discord Sign-In Error: ${error.message}`);
-    });
-});
-// Logout
+}
 logoutBtn.addEventListener('click', ()=>{
-    (0, _auth.signOut)(auth).then(()=>{
-        console.log("User signed out");
-    // UI will be updated by onAuthStateChanged
-    }).catch((error)=>{
-        console.error("Sign Out Error", error);
-    });
+    (0, _auth.signOut)(auth).catch((error)=>console.error("Sign Out Error", error));
 });
-// Listener for Authentication State Changes
-(0, _auth.onAuthStateChanged)(auth, (user)=>{
+(0, _auth.onAuthStateChanged)(auth, async (user)=>{
     if (user) {
-        // User is signed in
-        console.log("Auth State Changed: User Logged In", user);
-        userInfoDiv.style.display = 'block';
-        userNameSpan.textContent = user.displayName || user.email;
-        if (user.photoURL) {
-            userPhotoImg.src = user.photoURL;
-            userPhotoImg.style.display = 'block';
-        } else userPhotoImg.style.display = 'none';
-        loginGoogleBtn.style.display = 'none';
-        loginDiscordBtn.style.display = 'none';
+        await saveInitialUserData(user);
+        await refreshUserProfileDisplay(user);
+    } else {
+        loginButtonsContainer.style.display = 'block';
+        userInfoContainer.style.display = 'none';
+        profileSetupDiv.style.display = 'none';
+        gameLinksContainerP.textContent = 'Please log in and complete your profile to see available games.';
+        gameLinksContainerP.style.display = 'block';
+        gameListUl.style.display = 'none';
+        clearProfileForm();
+    }
+});
+function clearProfileForm() {
+    preferredNameInput.value = '';
+    firstNameInput.value = '';
+    usernameInput.value = '';
+    profileErrorP.style.display = 'none';
+    profileErrorP.textContent = '';
+}
+// --- Firestore User Data Management ---
+async function saveInitialUserData(firebaseUser) {
+    const userRef = (0, _firestore.doc)(db, "users", firebaseUser.uid);
+    try {
+        const docSnap = await (0, _firestore.getDoc)(userRef);
+        const dataToSet = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            lastLogin: (0, _firestore.serverTimestamp)(),
+            providerDisplayName: firebaseUser.displayName || null,
+            photoURL: firebaseUser.photoURL || null
+        };
+        if (!docSnap.exists()) {
+            console.log("Creating new user shell:", firebaseUser.uid);
+            await (0, _firestore.setDoc)(userRef, {
+                ...dataToSet,
+                createdAt: (0, _firestore.serverTimestamp)()
+            });
+        } else {
+            console.log("Updating user data:", firebaseUser.uid);
+            await (0, _firestore.updateDoc)(userRef, dataToSet);
+        }
+    } catch (error) {
+        console.error("Error saving initial user data:", error);
+    }
+}
+async function loadUserProfile(uid) {
+    if (!uid) return null;
+    const userRef = (0, _firestore.doc)(db, "users", uid);
+    try {
+        const docSnap = await (0, _firestore.getDoc)(userRef);
+        return docSnap.exists() ? docSnap.data() : null;
+    } catch (error) {
+        console.error("Error loading user profile:", error);
+        return null;
+    }
+}
+async function refreshUserProfileDisplay(firebaseUser) {
+    const userProfile = await loadUserProfile(firebaseUser.uid);
+    loginButtonsContainer.style.display = 'none';
+    if (userProfile && userProfile.username && userProfile.preferredName) {
+        userInfoContainer.style.display = 'block';
+        profileSetupDiv.style.display = 'none';
+        greetingNameSpan.textContent = userProfile.preferredName; // Use preferredName for greeting
+        displayedUsernameSpan.textContent = userProfile.username;
+        if (firebaseUser.photoURL) {
+            userPhoto.src = firebaseUser.photoURL;
+            userPhoto.style.display = 'block';
+        } else if (userProfile.photoURL) {
+            userPhoto.src = userProfile.photoURL;
+            userPhoto.style.display = 'block';
+        } else userPhoto.style.display = 'none';
         gameLinksContainerP.style.display = 'none';
         gameListUl.style.display = 'block';
-        // Save or update user in Firestore
-        saveUserData(user);
     } else {
-        // User is signed out
-        console.log("Auth State Changed: User Logged Out");
-        userInfoDiv.style.display = 'none';
-        loginGoogleBtn.style.display = 'block';
-        loginDiscordBtn.style.display = 'block';
+        profileSetupDiv.style.display = 'block';
+        userInfoContainer.style.display = 'none';
+        if (userProfile) {
+            preferredNameInput.value = userProfile.preferredName || '';
+            firstNameInput.value = userProfile.firstName || '';
+            usernameInput.value = userProfile.username || '';
+        }
+        // Pre-fill preferredName or firstName from provider if empty
+        if (!preferredNameInput.value && firebaseUser.displayName) preferredNameInput.value = firebaseUser.displayName.split(' ')[0] || firebaseUser.displayName;
+        if (!firstNameInput.value && firebaseUser.displayName && firebaseUser.displayName.includes(' ')) firstNameInput.value = firebaseUser.displayName.split(' ')[0] || '';
+        gameLinksContainerP.textContent = 'Please complete your profile to see available games.';
         gameLinksContainerP.style.display = 'block';
         gameListUl.style.display = 'none';
     }
-});
-// --- Firestore User Data Management ---
-async function saveUserData(user) {
-    const userRef = (0, _firestore.doc)(db, "users", user.uid); // Use user's UID as document ID
+}
+// --- Bad Word & Uniqueness Checkers ---
+function containsBadWord(text) {
+    if (!text) return false;
+    const lowerText = text.toLowerCase();
+    return BAD_WORDS.some((word)=>lowerText.includes(word));
+}
+async function isUsernameUnique(username, currentUid) {
+    const lowerUsername = username.toLowerCase();
+    const usersRef = (0, _firestore.collection)(db, "users");
+    // Query for username_lowercase. Make sure you have an index for this field in Firestore.
+    const q = (0, _firestore.query)(usersRef, (0, _firestore.where)("username_lowercase", "==", lowerUsername));
     try {
-        const docSnap = await (0, _firestore.getDoc)(userRef);
-        if (!docSnap.exists()) {
-            // New user: create their profile
-            console.log("Creating new user profile in Firestore for:", user.uid);
-            await (0, _firestore.setDoc)(userRef, {
-                uid: user.uid,
-                displayName: user.displayName || "Anonymous",
-                email: user.email,
-                photoURL: user.photoURL || null,
-                createdAt: (0, _firestore.serverTimestamp)(),
-                lastLogin: (0, _firestore.serverTimestamp)()
-            });
-        } else {
-            // Existing user: update last login time
-            console.log("Updating last login for user:", user.uid);
-            await updateDoc(userRef, {
-                lastLogin: (0, _firestore.serverTimestamp)(),
-                // Optionally update display name and photo URL if they might change
-                displayName: user.displayName || docSnap.data().displayName,
-                photoURL: user.photoURL || docSnap.data().photoURL
-            });
+        const querySnapshot = await (0, _firestore.getDocs)(q);
+        if (querySnapshot.empty) return true; // No user has this username
+        // Check if the found user is the current user (e.g., they are re-saving their profile)
+        for (const docSnap of querySnapshot.docs){
+            if (docSnap.id !== currentUid) return false; // Another user has this username
         }
+        return true; // Username belongs to the current user or is new
     } catch (error) {
-        console.error("Error saving user data to Firestore:", error);
+        console.error("Error checking username uniqueness:", error);
+        profileErrorP.textContent = "Error checking username. Please try again.";
+        profileErrorP.style.display = 'block';
+        return false; // Fail safe
     }
 }
+// --- Profile Setup Logic ---
+saveProfileBtn.addEventListener('click', async ()=>{
+    const user = auth.currentUser;
+    if (!user) {
+        profileErrorP.textContent = "You must be logged in.";
+        profileErrorP.style.display = 'block';
+        return;
+    }
+    const preferredName = preferredNameInput.value.trim();
+    const firstName = firstNameInput.value.trim(); // Optional
+    const username = usernameInput.value.trim();
+    const usernameLower = username.toLowerCase();
+    profileErrorP.style.display = 'none'; // Reset error
+    // Validation
+    if (!preferredName) {
+        profileErrorP.textContent = "Preferred name cannot be empty.";
+        profileErrorP.style.display = 'block';
+        preferredNameInput.focus();
+        return;
+    }
+    if (!username || username.length < 3 || username.length > 20 || !/^[a-zA-Z0-9_]+$/.test(username)) {
+        profileErrorP.textContent = "Public username must be 3-20 characters (letters, numbers, underscores).";
+        profileErrorP.style.display = 'block';
+        usernameInput.focus();
+        return;
+    }
+    if (containsBadWord(username)) {
+        profileErrorP.textContent = "Username contains inappropriate words. Please choose another.";
+        profileErrorP.style.display = 'block';
+        usernameInput.focus();
+        return;
+    }
+    saveProfileBtn.disabled = true;
+    saveProfileBtn.textContent = "Checking...";
+    const unique = await isUsernameUnique(username, user.uid);
+    if (!unique) {
+        profileErrorP.textContent = "This public username is already taken. Please choose another.";
+        profileErrorP.style.display = 'block';
+        usernameInput.focus();
+        saveProfileBtn.disabled = false;
+        saveProfileBtn.textContent = "Save Profile";
+        return;
+    }
+    saveProfileBtn.textContent = "Saving...";
+    try {
+        const userRef = (0, _firestore.doc)(db, "users", user.uid);
+        const profileData = {
+            preferredName: preferredName,
+            firstName: firstName || null,
+            username: username,
+            username_lowercase: usernameLower,
+            profileCompletedAt: (0, _firestore.serverTimestamp)()
+        };
+        // If you had a separate `usernames` collection for super-strict uniqueness:
+        // const batch = writeBatch(db);
+        // batch.set(userRef, profileData, { merge: true });
+        // const usernameDocRef = doc(db, "usernames", usernameLower);
+        // batch.set(usernameDocRef, { uid: user.uid }); // Claim username
+        // await batch.commit();
+        // Simpler approach for now:
+        await (0, _firestore.setDoc)(userRef, profileData, {
+            merge: true
+        });
+        console.log("Profile saved successfully!");
+        await refreshUserProfileDisplay(user);
+    } catch (error) {
+        console.error("Error saving profile:", error);
+        profileErrorP.textContent = "Error saving profile. Please try again.";
+        profileErrorP.style.display = 'block';
+    } finally{
+        saveProfileBtn.disabled = false;
+        saveProfileBtn.textContent = "Save Profile";
+    }
+}); /**
+ * Firestore Security Rules Considerations (add these to your Firestore rules):
+ *
+ * rules_version = '2';
+ * service cloud.firestore {
+ *   match /databases/{database}/documents {
+ *     match /users/{userId} {
+ *       allow read: if request.auth != null;
+ *       allow create: if request.auth.uid == userId;
+ *       allow update: if request.auth.uid == userId &&
+ *                       // Prevent changing UID, email directly after creation
+ *                       request.resource.data.uid == resource.data.uid &&
+ *                       request.resource.data.email == resource.data.email &&
+ *                       // Ensure username_lowercase matches username
+ *                       request.resource.data.username_lowercase == request.resource.data.username.lower() &&
+ *                       // Optionally, prevent changing username once set, or add other rules
+ *                       // (For username uniqueness, a Cloud Function or more complex rules are better)
+ *                       (!('username' in resource.data) || request.resource.data.username == resource.data.username);
+ *       // You might disallow deleting user documents from client or add specific conditions
+ *       allow delete: if false; // Or if request.auth.uid == userId under certain conditions
+ *     }
+ *
+ *     // For a more robust username uniqueness, you'd use a separate collection
+ *     // and enforce uniqueness with rules or a Cloud Function.
+ *     // Example (requires careful implementation and possibly a Cloud Function for atomicity):
+ *     // match /usernames/{username_lc} {
+ *     //   allow read;
+ *     //   allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+ *     //   allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+ *     // }
+ *   }
+ * }
+ */ 
 
 },{"firebase/app":"cYOm2","firebase/auth":"4ZBbi","firebase/firestore":"3RBs1"}],"cYOm2":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
