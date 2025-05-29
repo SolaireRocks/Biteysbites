@@ -13,8 +13,16 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 
 
 // Your web app's Firebase configuration (remains the same)
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyCPNx_s6eOCD69LDUNeCWLeL3tqoYKoTV8", // YOUR ACTUAL API KEY
+  apiKey: "AIzaSyCPNx_s6eOCD69LDUNeCWLeL3tqoYKoTV8",
   authDomain: "biteysbites.firebaseapp.com",
   projectId: "biteysbites",
   storageBucket: "biteysbites.firebasestorage.app",
@@ -22,6 +30,9 @@ const firebaseConfig = {
   appId: "1:192250302371:web:b0557cae57ef9575f69416",
   measurementId: "G-Y0B3P5EPLK"
 };
+
+// Initialize Firebase
+const analytics = getAnalytics(app);
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
