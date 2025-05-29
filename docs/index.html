@@ -1,0 +1,68 @@
+<!DOCTYPE html><html lang=en><meta name=viewport content="width=device-width, initial-scale=1.0"><title>Bitey's Game Hub</title><link rel=stylesheet href=Biteysbites.aa396440.css><body>
+    <header>
+        <h1>Welcome to Bitey's Game Hub!</h1>
+    </header>
+
+    <main>
+        <section id=auth-section>
+            <h2>User Account</h2>
+
+            
+            <div id=login-buttons-container>
+                <p>Please log in to continue.</p>
+                <button id=loginGoogleBtn>Login with Google</button>
+                <button id=loginDiscordBtn>Login with Discord</button>
+            </div>
+
+            
+            <div id=user-info-container style=display:none>
+                <img id=userPhoto src=# alt="User Photo" style=display:none>
+                <p>Welcome, <span id=greetingName></span>!</p>
+                <p>Public Username: <span id=displayedUsername></span></p>
+                <button id=logoutBtn>Logout</button>
+            </div>
+
+            
+            <div id=profile-setup style=display:none>
+                <h3>Complete Your Profile</h3>
+                <p>Let's set up your public presence and how we greet you!</p>
+                
+                <div>
+                    <label for=preferredNameInput>Preferred Name (how we greet you, private):</label>
+                    <input id=preferredNameInput placeholder="e.g., Alex, YourNickname">
+                    <small>This name is just for you and our direct communications.</small>
+                </div>
+
+                <div>
+                    <label for=firstNameInput>First Name (optional, for profile):</label>
+                    <input id=firstNameInput placeholder="Your first name">
+                </div>
+                
+                <div>
+                    <label for=usernameInput>Choose a Public Username:</label>
+                    <input id=usernameInput placeholder="Unique public username (3-20 chars)">
+                    <small>Letters, numbers, and underscores only. Must be unique and appropriate.</small>
+                </div>
+                
+                <button id=saveProfileBtn>Save Profile</button>
+                <p id=profileError style=color:red;display:none></p>
+            </div>
+        </section>
+
+        <section id=games-section>
+            <h2>Our Games</h2>
+            <div id=game-links-container>
+                <p>Please log in and complete your profile to see available games.</p> 
+                <ul id=gameList style=display:none>
+                    <li><a href=#>Example Game: Neon Runner</a></li> 
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2023 Bitey's Bites - Game Hub</p>
+    </footer>
+
+    <script type=module src=Biteysbites.ae39bdbc.js></script>
+
