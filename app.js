@@ -31,13 +31,14 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const analytics = getAnalytics(app);
+
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const functions = getFunctions(app); // Initialize Firebase Functions
+const analytics = getAnalytics(app);
 
 // --- Client-Side Bad Word List (Can be kept for quick UX, but server is authority) ---
 const CLIENT_SIDE_BAD_WORDS = ["admin", "root", "moderator"]; // Keep this list very minimal or remove
